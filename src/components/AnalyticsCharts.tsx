@@ -197,7 +197,7 @@ export const RevenueTrendChart: React.FC<RevenueTrendProps> = ({
       </div>
 
       {/* SVG Canvas & Tooltip Container */}
-      <div className="relative pt-4 overflow-hidden select-none">
+      <div className="relative pt-4 overflow-visible select-none">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-auto overflow-visible"
@@ -319,34 +319,46 @@ export const RevenueTrendChart: React.FC<RevenueTrendProps> = ({
         </svg>
 
         {/* Hover Tooltip Overlay */}
-        {activeHover && hoverIndex !== null && (
-          <div
-            className="absolute z-20 pointer-events-none bg-zinc-950/95 border border-zinc-800 backdrop-blur-md rounded-xl p-3 shadow-2xl text-xs space-y-1 transform -translate-x-1/2 transition-all duration-75"
-            style={{
-              left: `${(getX(hoverIndex) / width) * 100}%`,
-              top: '12px'
-            }}
-          >
-            <div className="font-semibold text-zinc-200 pb-1 border-b border-zinc-800 flex items-center justify-between gap-4">
-              <span>{new Date(activeHover.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
-              <span className="text-[10px] text-zinc-400 font-mono">Day {hoverIndex + 1}</span>
+        {activeHover && hoverIndex !== null && (() => {
+          const xPercent = (getX(hoverIndex) / width) * 100;
+          // Determine edge-aware horizontal anchor so tooltip never clips outside bounds
+          let transformStyle = 'translateX(-50%)';
+          if (xPercent > 70) {
+            transformStyle = 'translateX(-100%)';
+          } else if (xPercent < 30) {
+            transformStyle = 'translateX(0%)';
+          }
+
+          return (
+            <div
+              className="absolute z-20 pointer-events-none bg-zinc-950/95 border border-zinc-800 backdrop-blur-md rounded-xl p-3 shadow-2xl text-xs space-y-1 min-w-[210px] whitespace-nowrap transition-all duration-75"
+              style={{
+                left: `${xPercent}%`,
+                top: '12px',
+                transform: transformStyle,
+              }}
+            >
+              <div className="font-semibold text-zinc-200 pb-1 border-b border-zinc-800 flex items-center justify-between gap-4">
+                <span>{new Date(activeHover.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                <span className="text-[10px] text-zinc-400 font-mono">Day {hoverIndex + 1}</span>
+              </div>
+              <div className="pt-1 space-y-1">
+                <div className="flex justify-between gap-4 text-zinc-100">
+                  <span className="text-zinc-400">Sales:</span>
+                  <span className="font-semibold text-zinc-100 tabular-nums">₦{activeHover.totalSales.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between gap-4 text-zinc-300 text-[11px]">
+                  <span className="text-zinc-400">Orders:</span>
+                  <span className="tabular-nums">{activeHover.ordersCount} ({activeHover.successCount} fulfilled)</span>
+                </div>
+                <div className="flex justify-between gap-4 text-emerald-400 text-[11px] pt-1 border-t border-zinc-800">
+                  <span className="text-zinc-400">Profit:</span>
+                  <span className="font-semibold tabular-nums">₦{activeHover.netProfit.toLocaleString()}</span>
+                </div>
+              </div>
             </div>
-            <div className="pt-1 space-y-1">
-              <div className="flex justify-between gap-4 text-zinc-100">
-                <span className="text-zinc-400">Sales:</span>
-                <span className="font-semibold text-zinc-100 tabular-nums">₦{activeHover.totalSales.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between gap-4 text-zinc-300 text-[11px]">
-                <span className="text-zinc-400">Orders:</span>
-                <span className="tabular-nums">{activeHover.ordersCount} ({activeHover.successCount} fulfilled)</span>
-              </div>
-              <div className="flex justify-between gap-4 text-emerald-400 text-[11px] pt-1 border-t border-zinc-800">
-                <span className="text-zinc-400">Profit:</span>
-                <span className="font-semibold tabular-nums">₦{activeHover.netProfit.toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
@@ -588,7 +600,11 @@ export const HourlyActivityChart: React.FC<HourlyActivityProps> = ({ orders = []
             >
               {/* Tooltip on hover */}
               {isHovered && (
-                <div className="absolute -top-9 z-30 pointer-events-none bg-zinc-950 border border-zinc-800 text-zinc-100 text-[11px] font-mono px-2 py-1 rounded-md shadow-xl whitespace-nowrap">
+                <div
+                  className={`absolute -top-9 z-30 pointer-events-none bg-zinc-950 border border-zinc-800 text-zinc-100 text-[11px] font-mono px-2 py-1 rounded-md shadow-xl whitespace-nowrap ${
+                    d.hour >= 21 ? 'right-0' : d.hour <= 2 ? 'left-0' : 'left-1/2 -translate-x-1/2'
+                  }`}
+                >
                   {d.label}: {d.volume} vends
                 </div>
               )}
