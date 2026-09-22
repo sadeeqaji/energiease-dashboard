@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, AlertTriangle, Copy, Check, RefreshCw, ChevronLeft, ChevronRight, Coins } from 'lucide-react';
+import { Search, AlertTriangle, Copy, Check, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { OrderItem, AdminUser } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { api } from '../api';
@@ -149,14 +149,6 @@ export const SupportView: React.FC<Props> = ({ onSelectOrder, user }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Commission Notice - Restricted to Accounting & Superadmin */}
-            {canSeeCommission && (
-              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono">
-                <Coins className="w-3 h-3" />
-                <span>BP Margin (+1.5%) Visible</span>
-              </div>
-            )}
-
             <div className="flex items-center gap-2">
               <span className="text-zinc-400 text-[11px] uppercase font-medium tracking-wider">DISCO:</span>
               <select
