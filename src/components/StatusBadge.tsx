@@ -38,6 +38,12 @@ export const StatusBadge: React.FC<Props> = ({ status, size = 'sm' }) => {
     text = 'text-rose-400';
     border = 'border-rose-500/20';
     dot = 'bg-rose-400';
+  } else if (norm === 'expired') {
+    label = 'Expired';
+    bg = 'bg-zinc-800/80';
+    text = 'text-zinc-400';
+    border = 'border-zinc-700/80';
+    dot = 'bg-zinc-500';
   }
 
   const px = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';

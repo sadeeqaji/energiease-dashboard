@@ -19,7 +19,7 @@ export interface OrderItem {
   buypowerCommission?: number;
   monnifyFee?: number;
   netProfit?: number;
-  status: 'pending_payment' | 'processing' | 'success' | 'failed';
+  status: 'pending_payment' | 'processing' | 'success' | 'failed' | 'expired';
   disco: string;
   meterNumber: string;
   meterName: string;

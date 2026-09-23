@@ -112,6 +112,7 @@ export const SupportView: React.FC<Props> = ({ onSelectOrder, user }) => {
               { id: 'success', label: 'Success' },
               { id: 'processing', label: 'Processing' },
               { id: 'failed', label: 'Failed' },
+              { id: 'expired', label: 'Expired' },
             ].map((f) => (
               <button
                 key={f.id}
