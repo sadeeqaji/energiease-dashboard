@@ -458,7 +458,16 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={handleRetryVend}
-              disabled={retrying || currentOrder.status === 'success'}
+              disabled={retrying || currentOrder.status === 'success' || currentOrder.status === 'expired' || currentOrder.status === 'pending_payment'}
+              title={
+                currentOrder.status === 'expired'
+                  ? 'Payment window expired - retry vending disabled'
+                  : currentOrder.status === 'pending_payment'
+                  ? 'Awaiting customer payment - retry vending disabled'
+                  : currentOrder.status === 'success'
+                  ? 'Order already completed'
+                  : undefined
+              }
               className="h-9 px-3 rounded-lg border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:border-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-zinc-100 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <RotateCw className={`w-3.5 h-3.5 ${retrying ? 'animate-spin' : ''}`} />
@@ -487,16 +496,33 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
               </button>
             )}
 
-            <a
-              href={api.getReceiptUrl(currentOrder.reference)}
-              target="_blank"
-              rel="noreferrer"
-              className="h-8.5 flex-1 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/60 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <FileText className="w-3.5 h-3.5 text-zinc-400" />
-              <span>Official Receipt (PDF)</span>
-              <ArrowUpRight className="w-3 h-3 text-zinc-500" />
-            </a>
+            {currentOrder.status === 'success' ? (
+              <a
+                href={api.getReceiptUrl(currentOrder.reference)}
+                target="_blank"
+                rel="noreferrer"
+                className="h-8.5 flex-1 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/60 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Official Receipt (PDF)</span>
+                <ArrowUpRight className="w-3 h-3 text-zinc-500" />
+              </a>
+            ) : (
+              <button
+                disabled
+                title={
+                  currentOrder.status === 'expired'
+                    ? 'Receipt unavailable: payment window expired'
+                    : currentOrder.status === 'pending_payment'
+                    ? 'Receipt unavailable: order awaiting customer payment'
+                    : 'Receipt unavailable: order not completed'
+                }
+                className="h-8.5 flex-1 rounded-lg border border-zinc-800/80 bg-zinc-900/30 text-zinc-600 text-xs font-medium flex items-center justify-center gap-2 cursor-not-allowed select-none"
+              >
+                <FileText className="w-3.5 h-3.5 text-zinc-600" />
+                <span>Receipt Unavailable ({currentOrder.status === 'expired' ? 'Expired' : 'Pending'})</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
