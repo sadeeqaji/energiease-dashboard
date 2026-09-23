@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Copy, 
@@ -25,6 +25,7 @@ interface Props {
 }
 
 export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpdated }) => {
+  const [currentOrder, setCurrentOrder] = useState<OrderItem | null>(order);
   const [copied, setCopied] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [resending, setResending] = useState(false);
@@ -34,11 +35,36 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
   const [monnifyData, setMonnifyData] = useState<any>(null);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  if (!order) return null;
+  useEffect(() => {
+    setCurrentOrder(order);
+    setActionMessage(null);
+    setMonnifyData(null);
+
+    if (order?.reference) {
+      api.getOrderDetail(order.reference).then((fresh) => {
+        if (fresh) {
+          setCurrentOrder((prev) => ({
+            ...prev,
+            ...fresh,
+            token: fresh.token || fresh.details?.token || fresh.providerResponse?.token,
+            units: fresh.units || fresh.details?.units || fresh.providerResponse?.units,
+            disco: fresh.disco || fresh.details?.disco,
+            meterNumber: fresh.meterNumber || fresh.details?.meterNumber,
+            meterName: fresh.meterName || fresh.details?.meterName || fresh.details?.name,
+          }));
+        }
+      }).catch(() => {});
+    }
+  }, [order?.reference]);
+
+  if (!currentOrder) return null;
+
+  const rawToken = currentOrder.token || (currentOrder as any).providerResponse?.token || (currentOrder as any).details?.token;
+  const rawUnits = currentOrder.units || (currentOrder as any).providerResponse?.units || (currentOrder as any).details?.units;
 
   const handleCopyToken = () => {
-    if (!order.token) return;
-    navigator.clipboard.writeText(order.token.replace(/\D/g, ''));
+    if (!rawToken) return;
+    navigator.clipboard.writeText(rawToken.replace(/\D/g, ''));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -47,8 +73,17 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
     setRetrying(true);
     setActionMessage(null);
     try {
-      const res = await api.retryVend(order.reference);
+      const res = await api.retryVend(currentOrder.reference);
       setActionMessage({ type: res.success ? 'success' : 'error', text: res.message });
+      const fresh = await api.getOrderDetail(currentOrder.reference).catch(() => null);
+      if (fresh) {
+        setCurrentOrder((prev) => ({
+          ...prev,
+          ...fresh,
+          token: fresh.token || fresh.details?.token || fresh.providerResponse?.token,
+          units: fresh.units || fresh.details?.units || fresh.providerResponse?.units,
+        }));
+      }
       if (res.success && onOrderUpdated) {
         onOrderUpdated();
       }
@@ -63,8 +98,17 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
     setRequerying(true);
     setActionMessage(null);
     try {
-      const res = await api.requeryBuyPower(order.reference);
+      const res = await api.requeryBuyPower(currentOrder.reference);
       setActionMessage({ type: res.success ? 'success' : 'error', text: res.message });
+      const fresh = await api.getOrderDetail(currentOrder.reference).catch(() => null);
+      if (fresh) {
+        setCurrentOrder((prev) => ({
+          ...prev,
+          ...fresh,
+          token: fresh.token || fresh.details?.token || fresh.providerResponse?.token,
+          units: fresh.units || fresh.details?.units || fresh.providerResponse?.units,
+        }));
+      }
       if (res.updated && onOrderUpdated) {
         onOrderUpdated();
       }
@@ -79,7 +123,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
     setVerifyingMonnify(true);
     setActionMessage(null);
     try {
-      const res = await api.verifyMonnify(order.reference);
+      const res = await api.verifyMonnify(currentOrder.reference);
       setMonnifyData(res.monnify);
       setActionMessage({ type: 'success', text: `Monnify verified: ${res.monnify?.paymentStatus} (Fee: ₦${res.monnify?.fee || 0})` });
       if (res.updated && onOrderUpdated) {
@@ -99,7 +143,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
     setRefunding(true);
     setActionMessage(null);
     try {
-      const res = await api.refundOrder(order.reference, reason);
+      const res = await api.refundOrder(currentOrder.reference, reason);
       setActionMessage({ type: 'success', text: res.message });
       if (onOrderUpdated) {
         onOrderUpdated();
@@ -115,7 +159,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
     setResending(true);
     setActionMessage(null);
     try {
-      const res = await api.resendToken(order.reference);
+      const res = await api.resendToken(currentOrder.reference);
       setActionMessage({ type: 'success', text: res.message });
     } catch (err: any) {
       setActionMessage({ type: 'error', text: err.message || 'Failed to resend token' });
@@ -133,8 +177,8 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
     return [raw];
   };
 
-  const tokenGroups = formatTokenGroups(order.token);
-  const bpComm = order.buypowerCommission ?? (order.vendAmount * 0.015);
+  const tokenGroups = formatTokenGroups(rawToken);
+  const bpComm = currentOrder.buypowerCommission ?? (currentOrder.vendAmount * 0.015);
   const canSeeCommission = user?.role === 'superadmin' || user?.role === 'admin' || user?.role === 'accounting';
 
   return (
@@ -153,12 +197,12 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-medium text-zinc-300 tracking-wide">
-                {order.reference}
+                {currentOrder.reference}
               </span>
-              <StatusBadge status={order.status} size="sm" />
+              <StatusBadge status={currentOrder.status} size="sm" />
             </div>
             <div className="text-[11px] text-zinc-400 mt-0.5">
-              Processed on {new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              Processed on {new Date(currentOrder.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} at {new Date(currentOrder.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </div>
           </div>
           <button
@@ -197,7 +241,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
                 <span className="text-xs font-medium text-zinc-300">Electricity Token</span>
                 <span className="text-[10px] text-zinc-400 font-mono">STS Standard</span>
               </div>
-              {order.token && (
+              {rawToken && (
                 <button
                   onClick={handleCopyToken}
                   className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md border border-zinc-700/80 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 hover:text-white transition-colors cursor-pointer"
@@ -236,20 +280,20 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
             <div className="flex items-center justify-between text-xs pt-0.5 text-zinc-400">
               <span>Units credited</span>
               <span className="text-zinc-200 font-medium font-mono tabular-nums">
-                {order.units ? `${order.units} kWh` : '—'}
+                {rawUnits ? `${rawUnits} kWh` : '—'}
               </span>
             </div>
           </div>
 
-          {/* Failure Diagnostics if flagged */}
-          {(order.requiresManualIntervention || order.status === 'failed' || order.fulfillmentFailureReason) && (
+          {/* Failure Diagnostics if flagged (only if not success) */}
+          {currentOrder.status !== 'success' && (currentOrder.requiresManualIntervention || currentOrder.status === 'failed' || currentOrder.fulfillmentFailureReason) && (
             <div className="p-3.5 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-1.5">
               <div className="flex items-center gap-2 text-xs font-semibold text-rose-400">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>Provider Delivery Issue</span>
               </div>
               <p className="text-xs text-rose-300/90 leading-relaxed break-words">
-                {order.fulfillmentFailureReason || 'The upstream vending service could not generate a token. You can retry or verify provider balance.'}
+                {currentOrder.fulfillmentFailureReason || 'The upstream vending service could not generate a token. You can retry or verify provider balance.'}
               </p>
             </div>
           )}
@@ -263,30 +307,30 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
             <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 divide-y divide-zinc-800/60 text-xs">
               <div className="flex items-center justify-between px-3.5 py-2.5">
                 <span className="text-zinc-400">Customer Phone</span>
-                <span className="text-zinc-200 font-mono">{order.customerPhone}</span>
+                <span className="text-zinc-200 font-mono">{currentOrder.customerPhone}</span>
               </div>
 
               <div className="flex items-center justify-between px-3.5 py-2.5">
                 <span className="text-zinc-400">Electricity Provider</span>
-                <span className="text-zinc-200 font-medium">{order.disco}</span>
+                <span className="text-zinc-200 font-medium">{currentOrder.disco}</span>
               </div>
 
               <div className="flex items-center justify-between px-3.5 py-2.5">
                 <span className="text-zinc-400">Meter Number</span>
-                <span className="text-zinc-200 font-mono font-medium">{order.meterNumber}</span>
+                <span className="text-zinc-200 font-mono font-medium">{currentOrder.meterNumber}</span>
               </div>
 
               <div className="flex items-center justify-between px-3.5 py-2.5">
                 <span className="text-zinc-400">Account Name</span>
                 <span className="text-zinc-300 truncate max-w-[220px] text-right">
-                  {order.meterName || 'N/A'}
+                  {currentOrder.meterName || 'N/A'}
                 </span>
               </div>
 
               <div className="flex items-center justify-between px-3.5 py-2.5">
                 <span className="text-zinc-400">Fulfillment Gateway</span>
                 <span className="text-zinc-300 uppercase font-mono text-[11px]">
-                  {order.provider || 'BUYPOWER'}
+                  {currentOrder.provider || 'BUYPOWER'}
                 </span>
               </div>
             </div>
@@ -342,18 +386,18 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
               <div className="flex items-center justify-between">
                 <span className="text-zinc-400">Customer paid</span>
                 <span className="text-zinc-100 font-semibold font-mono tabular-nums">
-                  ₦{order.amount.toLocaleString()}
+                  ₦{currentOrder.amount.toLocaleString()}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-zinc-400">
                 <span>DISCO electricity cost</span>
-                <span className="font-mono tabular-nums">₦{order.vendAmount.toLocaleString()}</span>
+                <span className="font-mono tabular-nums">₦{currentOrder.vendAmount.toLocaleString()}</span>
               </div>
 
               <div className="flex items-center justify-between text-zinc-400">
                 <span>Service fee (EnergiEase)</span>
-                <span className="font-mono tabular-nums">+₦{order.serviceFee.toLocaleString()}</span>
+                <span className="font-mono tabular-nums">+₦{currentOrder.serviceFee.toLocaleString()}</span>
               </div>
 
               {canSeeCommission && (
@@ -369,7 +413,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
                     <div className="flex items-center justify-between text-zinc-300">
                       <span className="text-zinc-400">Monnify gateway fee (1.6125%)</span>
                       <span className="font-mono text-zinc-400 tabular-nums">
-                        -₦{(order.monnifyFee ?? 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        -₦{(currentOrder.monnifyFee ?? 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>
@@ -377,7 +421,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
                   <div className="pt-2.5 border-t border-zinc-800/80 flex items-center justify-between">
                     <span className="text-zinc-200 font-medium">Net margin</span>
                     <span className="text-sm font-semibold font-mono text-emerald-400 tabular-nums">
-                      ₦{(order.netProfit ?? 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      ₦{(currentOrder.netProfit ?? 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </>
@@ -414,7 +458,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={handleRetryVend}
-              disabled={retrying || order.status === 'success'}
+              disabled={retrying || currentOrder.status === 'success'}
               className="h-9 px-3 rounded-lg border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:border-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-zinc-100 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <RotateCw className={`w-3.5 h-3.5 ${retrying ? 'animate-spin' : ''}`} />
@@ -423,7 +467,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
 
             <button
               onClick={handleResendWhatsApp}
-              disabled={resending || !order.token}
+              disabled={resending || !rawToken}
               className="h-9 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-900 disabled:border disabled:border-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <Send className={`w-3.5 h-3.5 ${resending ? 'animate-pulse' : ''}`} />
@@ -433,7 +477,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
 
           {/* Secondary Actions: Refund + PDF */}
           <div className="flex items-center gap-2 pt-0.5">
-            {(order.requiresManualIntervention || order.status === 'failed') && (
+            {(currentOrder.requiresManualIntervention || currentOrder.status === 'failed') && (
               <button
                 onClick={handleInitiateRefund}
                 disabled={refunding}
@@ -444,7 +488,7 @@ export const OrderDrawer: React.FC<Props> = ({ order, user, onClose, onOrderUpda
             )}
 
             <a
-              href={api.getReceiptUrl(order.reference)}
+              href={api.getReceiptUrl(currentOrder.reference)}
               target="_blank"
               rel="noreferrer"
               className="h-8.5 flex-1 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/60 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
