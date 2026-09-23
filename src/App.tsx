@@ -12,6 +12,7 @@ import { CustomersView } from './views/CustomersView';
 import { StaffView } from './views/StaffView';
 import { AnalyticsView } from './views/AnalyticsView';
 import { SupportDeskView } from './views/SupportDeskView';
+import { SettingsView } from './views/SettingsView';
 
 export function App() {
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(api.getSavedUser());
@@ -99,6 +100,8 @@ export function App() {
         return 'Registered Customers & Saved Meters';
       case 'staff':
         return 'Staff & Access Management (RBAC)';
+      case 'settings':
+        return 'System Settings & Gateway Routing';
       default:
         return 'Operations Portal';
     }
@@ -176,6 +179,10 @@ export function App() {
 
           {activeTab === 'staff' && currentUser.role === 'superadmin' && (
             <StaffView />
+          )}
+
+          {activeTab === 'settings' && (currentUser.role === 'admin' || currentUser.role === 'superadmin') && (
+            <SettingsView user={currentUser} />
           )}
         </main>
       </div>

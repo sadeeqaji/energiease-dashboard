@@ -196,3 +196,9 @@ export interface SupportTicketDetails {
   };
 }
 
+export interface PaymentGatewayConfig {
+  activeGateway: 'BuyPowerMFB' | 'Monnify' | 'Paystack';
+  availableGateways: ('BuyPowerMFB' | 'Monnify' | 'Paystack')[];
+  fallbackOrder: ('BuyPowerMFB' | 'Monnify' | 'Paystack')[];
+}
+

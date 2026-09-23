@@ -1,4 +1,4 @@
-import { AdminUser, DashboardStats, DiscoHealth, OrderItem, AccountingSummary, Customer, OrderTrend, StaffUser, SupportTicket, SupportTicketDetails } from './types';
+import { AdminUser, DashboardStats, DiscoHealth, OrderItem, AccountingSummary, Customer, OrderTrend, StaffUser, SupportTicket, SupportTicketDetails, PaymentGatewayConfig } from './types';
 
 const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
@@ -283,6 +283,23 @@ class ApiClient {
       `/admin/support/orders-by-phone?${searchParams.toString()}`
     );
     return res.orders || [];
+  }
+
+  async getPaymentGatewayConfig(): Promise<PaymentGatewayConfig> {
+    return this.request<PaymentGatewayConfig>('/admin/system/payment-gateway');
+  }
+
+  async updatePaymentGatewayConfig(primaryGateway: 'BuyPowerMFB' | 'Monnify' | 'Paystack'): Promise<{
+    success: boolean;
+    activeGateway: 'BuyPowerMFB' | 'Monnify' | 'Paystack';
+    availableGateways: ('BuyPowerMFB' | 'Monnify' | 'Paystack')[];
+    fallbackOrder: ('BuyPowerMFB' | 'Monnify' | 'Paystack')[];
+    message: string;
+  }> {
+    return this.request('/admin/system/payment-gateway', {
+      method: 'PATCH',
+      body: JSON.stringify({ primaryGateway }),
+    });
   }
 }
 

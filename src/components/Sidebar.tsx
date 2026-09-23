@@ -11,7 +11,8 @@ import {
   BarChart3,
   MessageSquare,
   PanelLeftClose,
-  PanelLeft
+  PanelLeft,
+  Settings
 } from 'lucide-react';
 import { AdminUser } from '../types';
 import Logo, { LogoIcon } from './Logo';
@@ -95,6 +96,12 @@ export const Sidebar: React.FC<Props> = ({ user, activeTab, onSelectTab, onLogou
       label: 'Staff & Access (RBAC)',
       icon: ShieldCheck,
       visible: isSuperadmin,
+    },
+    {
+      id: 'settings',
+      label: 'System Settings',
+      icon: Settings,
+      visible: isAdminOrSuper,
     },
   ].filter(item => item.visible);
 
