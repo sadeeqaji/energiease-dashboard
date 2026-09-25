@@ -137,7 +137,7 @@ export const LoginView: React.FC<Props> = ({ onLoginSuccess }) => {
 
         {/* Environment footer */}
         <div className="text-center text-[11px] text-zinc-500 font-sans">
-          Mind Colony Limited • EnergiEase Operations
+          Energiease Technology Limited • EnergiEase Operations
         </div>
 
       </div>
