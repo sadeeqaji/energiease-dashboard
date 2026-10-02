@@ -72,7 +72,7 @@ export const LoginView: React.FC<Props> = ({ onLoginSuccess }) => {
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="yusuf.sahabo or name@energiease.ng"
+                  placeholder="admin@energiease.ng"
                   autoCapitalize="none"
                   autoCorrect="off"
                   className="w-full h-10 pl-10 pr-3 rounded-lg bg-zinc-950/80 border border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-xs sm:text-sm text-zinc-100 placeholder:text-zinc-500 transition-colors"
