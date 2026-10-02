@@ -64,15 +64,17 @@ export const LoginView: React.FC<Props> = ({ onLoginSuccess }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-zinc-300 block">
-                Staff Email
+                Staff Email or Username
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3.5" />
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@energiease.ng"
+                  placeholder="yusuf.sahabo or name@energiease.ng"
+                  autoCapitalize="none"
+                  autoCorrect="off"
                   className="w-full h-10 pl-10 pr-3 rounded-lg bg-zinc-950/80 border border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-xs sm:text-sm text-zinc-100 placeholder:text-zinc-500 transition-colors"
                   required
                 />
