@@ -338,8 +338,8 @@ export const ManualVendModal: React.FC<Props> = ({
               <Zap className="w-4 h-4 fill-emerald-400/20" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-white tracking-tight">Manual Meter Verification & Vend</h2>
-              <p className="text-[11px] text-zinc-400">Direct bank payment fulfillment & WhatsApp payment links</p>
+              <h2 className="text-sm font-semibold text-white tracking-tight">Manual Vend</h2>
+              <p className="text-[11px] text-zinc-400">Verify meter, vend directly, or send a payment link</p>
             </div>
           </div>
           <button
@@ -359,9 +359,9 @@ export const ManualVendModal: React.FC<Props> = ({
                 <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-bold text-white">Electricity Token Generated!</h3>
+                <h3 className="text-base font-bold text-white">Token Vended</h3>
                 <p className="text-xs text-emerald-300/80">
-                  {vendResult.message || 'Token vended successfully from BuyPower'}
+                  {vendResult.message || 'Electricity token generated'}
                 </p>
               </div>
 
@@ -381,7 +381,7 @@ export const ManualVendModal: React.FC<Props> = ({
                     {tokenCopied ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-emerald-400">Copied!</span>
+                        <span className="text-emerald-400">Copied</span>
                       </>
                     ) : (
                       <>
@@ -398,7 +398,7 @@ export const ManualVendModal: React.FC<Props> = ({
                     className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Download Receipt (PDF)</span>
+                    <span>Receipt PDF</span>
                   </a>
                 </div>
               </div>
@@ -410,15 +410,15 @@ export const ManualVendModal: React.FC<Props> = ({
                   <span className="font-semibold text-zinc-200">{vendResult.customerName || 'N/A'}</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-zinc-900/50 border border-zinc-800/80">
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">Units Credited</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">Units</span>
                   <span className="font-semibold text-emerald-400 font-mono">{vendResult.units || 'N/A'} kWh</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-zinc-900/50 border border-zinc-800/80">
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">Meter / Disco</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">Meter</span>
                   <span className="font-mono text-zinc-200">{vendResult.meterNumber} ({vendResult.disco})</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-zinc-900/50 border border-zinc-800/80">
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">Order Reference</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">Reference</span>
                   <span className="font-mono text-zinc-300">{vendResult.reference}</span>
                 </div>
               </div>
@@ -428,13 +428,13 @@ export const ManualVendModal: React.FC<Props> = ({
                 <div className="p-3 rounded-lg bg-amber-950/30 border border-amber-500/20 text-xs text-amber-300 flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <span>
-                    WhatsApp delivery pending. Please copy the token above and share it with the customer directly.
+                    WhatsApp delivery pending. Copy and share token manually.
                   </span>
                 </div>
               ) : (
                 <div className="p-3 rounded-lg bg-zinc-900/60 border border-zinc-800 text-xs text-zinc-300 flex items-center gap-2">
                   <Send className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Token and electronic receipt dispatched to customer WhatsApp.</span>
+                  <span>Token and receipt sent via WhatsApp.</span>
                 </div>
               )}
 
@@ -444,7 +444,7 @@ export const ManualVendModal: React.FC<Props> = ({
                   onClick={handleReset}
                   className="h-9 px-4 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  Vend Another Meter
+                  New Vend
                 </button>
                 <button
                   onClick={onClose}
@@ -461,11 +461,11 @@ export const ManualVendModal: React.FC<Props> = ({
                 <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-bold text-white">Payment Link & Account Generated!</h3>
+                <h3 className="text-base font-bold text-white">Payment Link Ready</h3>
                 <p className="text-xs text-emerald-300/80">
                   {linkResult.whatsappSent 
-                    ? `Payment details dispatched to customer WhatsApp (${customerPhone})` 
-                    : 'Dedicated bank account ready for transfer'}
+                    ? `Sent to ${customerPhone} on WhatsApp` 
+                    : 'Transfer account ready'}
                 </p>
               </div>
 
@@ -475,10 +475,10 @@ export const ManualVendModal: React.FC<Props> = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-zinc-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
                       <Landmark className="w-4 h-4 text-emerald-400" />
-                      Dedicated Bank Transfer
+                      Transfer Account
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono">
-                      Auto-Vend on Pay
+                      Auto-Vend
                     </span>
                   </div>
 
@@ -514,7 +514,7 @@ export const ManualVendModal: React.FC<Props> = ({
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-zinc-400 pt-1">
-                    <span>Payable Amount:</span>
+                    <span>Amount Due</span>
                     <span className="text-base font-bold font-mono text-emerald-400">
                       ₦{linkResult.totalAmount.toLocaleString()}
                     </span>
@@ -526,7 +526,7 @@ export const ManualVendModal: React.FC<Props> = ({
               {linkResult.paymentUrl && (
                 <div className="p-3 rounded-lg bg-zinc-900/60 border border-zinc-800 space-y-2">
                   <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">
-                    Online Checkout Link
+                    Checkout URL
                   </span>
                   <div className="flex items-center gap-2">
                     <input
@@ -560,11 +560,9 @@ export const ManualVendModal: React.FC<Props> = ({
               )}
 
               {/* Note on Auto Vending */}
-              <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/20 text-xs text-emerald-300/90 flex items-start gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Zero-touch fulfillment:</strong> As soon as the customer transfers to this bank account or pays via the link, the system will verify payment and <strong>automatically vend the token to their WhatsApp</strong>.
-                </span>
+              <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/20 text-xs text-emerald-300/90 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Token vends automatically once payment settles.</span>
               </div>
 
               {/* Action Buttons */}
@@ -573,7 +571,7 @@ export const ManualVendModal: React.FC<Props> = ({
                   onClick={handleReset}
                   className="h-9 px-4 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  Create Another Link
+                  New Link
                 </button>
                 <button
                   onClick={onClose}
@@ -647,9 +645,8 @@ export const ManualVendModal: React.FC<Props> = ({
 
                 {/* DISCO Dropdown */}
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-medium text-zinc-300 uppercase tracking-wider flex items-center justify-between">
-                    <span>Electricity Distribution Company (DISCO)</span>
-                    <span className="text-zinc-500 text-[10px] font-normal">BuyPower Live Gateway</span>
+                  <label className="text-[11px] font-medium text-zinc-300 uppercase tracking-wider block">
+                    DISCO
                   </label>
                   <select
                     value={disco}
@@ -678,12 +675,12 @@ export const ManualVendModal: React.FC<Props> = ({
                   {verifying ? (
                     <>
                       <RotateCw className="w-3.5 h-3.5 animate-spin text-zinc-400" />
-                      <span>Verifying meter with {disco}...</span>
+                      <span>Verifying...</span>
                     </>
                   ) : (
                     <>
                       <Search className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>Verify Customer & Meter Details</span>
+                      <span>Verify Meter</span>
                     </>
                   )}
                 </button>
@@ -704,7 +701,7 @@ export const ManualVendModal: React.FC<Props> = ({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-semibold">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Verified Account</span>
+                        <span>Verified Meter</span>
                       </div>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono font-medium">
                         Min. ₦{verificationResult.minVendAmount?.toLocaleString() || '1,000'}
@@ -715,7 +712,7 @@ export const ManualVendModal: React.FC<Props> = ({
                       <div className="flex items-start gap-2">
                         <User className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
                         <div>
-                          <span className="text-[10px] text-zinc-500 block uppercase">Customer Name</span>
+                          <span className="text-[10px] text-zinc-500 block uppercase">Customer</span>
                           <span className="font-semibold text-white">{verificationResult.name}</span>
                         </div>
                       </div>
@@ -723,7 +720,7 @@ export const ManualVendModal: React.FC<Props> = ({
                       <div className="flex items-start gap-2">
                         <Zap className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
                         <div>
-                          <span className="text-[10px] text-zinc-500 block uppercase">Meter / Disco</span>
+                          <span className="text-[10px] text-zinc-500 block uppercase">Meter</span>
                           <span className="font-mono text-zinc-200">{verificationResult.meterNumber} ({verificationResult.disco})</span>
                         </div>
                       </div>
@@ -741,7 +738,7 @@ export const ManualVendModal: React.FC<Props> = ({
                   </div>
 
                   {/* 3 OPERATIONAL WORKFLOW TABS */}
-                  <div className="flex items-center border-b border-zinc-800 gap-3 text-xs font-medium">
+                  <div className="flex items-center border-b border-zinc-800 gap-4 text-xs font-medium">
                     <button
                       type="button"
                       onClick={() => setActionMode('direct_vend')}
@@ -752,7 +749,7 @@ export const ManualVendModal: React.FC<Props> = ({
                       }`}
                     >
                       <Zap className="w-3.5 h-3.5" />
-                      <span>⚡ Vend Directly (Bank Paid)</span>
+                      <span>Direct Vend</span>
                     </button>
 
                     <button
@@ -765,7 +762,7 @@ export const ManualVendModal: React.FC<Props> = ({
                       }`}
                     >
                       <LinkIcon className="w-3.5 h-3.5" />
-                      <span>🔗 Send Payment Link</span>
+                      <span>Payment Link</span>
                     </button>
 
                     <button
@@ -786,14 +783,14 @@ export const ManualVendModal: React.FC<Props> = ({
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-medium text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
                       <Phone className="w-3 h-3 text-zinc-400" />
-                      <span>Customer WhatsApp / Phone Number</span>
+                      <span>WhatsApp Number</span>
                       <span className="text-rose-400">*</span>
                     </label>
                     <input
                       type="text"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="e.g. 08012345678 or 2348012345678"
+                      placeholder="08012345678"
                       className="w-full h-10 px-3 rounded-lg bg-zinc-900 border border-zinc-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none text-xs font-mono text-white placeholder:text-zinc-600 transition-colors"
                     />
                   </div>
@@ -801,18 +798,16 @@ export const ManualVendModal: React.FC<Props> = ({
                   {/* MODE 1: DIRECT VEND (MANUAL BANK PAYMENT CONFIRMED) */}
                   {actionMode === 'direct_vend' && (
                     <div className="space-y-3 pt-1">
-                      <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
-                        <span>
-                          <strong>Manual bank payment confirmed:</strong> The customer paid directly to our corporate bank account or cash. Vending will execute automatically from BuyPower and deliver token + receipt to customer WhatsApp.
-                        </span>
+                      <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                        <span>For confirmed bank transfers. Vends token immediately.</span>
                       </div>
 
                       {/* Amount Input */}
                       <div className="space-y-1.5">
                         <label className="text-[11px] font-medium text-zinc-300 uppercase tracking-wider flex items-center justify-between">
-                          <span>Vend Amount (₦)</span>
-                          <span className="text-zinc-500 text-[10px]">No Service Fee Applied</span>
+                          <span>Amount (₦)</span>
+                          <span className="text-zinc-500 text-[10px]">No service fee</span>
                         </label>
                         <div className="relative">
                           <span className="absolute left-3.5 top-2.5 text-zinc-400 font-mono text-sm">₦</span>
@@ -853,7 +848,7 @@ export const ManualVendModal: React.FC<Props> = ({
                           onChange={(e) => setNotifyWhatsApp(e.target.checked)}
                           className="rounded border-zinc-800 bg-zinc-900 text-emerald-500 focus:ring-emerald-500 w-4 h-4"
                         />
-                        <span>Send Token & PDF Receipt to WhatsApp automatically</span>
+                        <span>Send token & receipt via WhatsApp</span>
                       </label>
 
                       {submitError && (
@@ -872,12 +867,12 @@ export const ManualVendModal: React.FC<Props> = ({
                         {submitting ? (
                           <>
                             <RotateCw className="w-4 h-4 animate-spin text-white" />
-                            <span>Vending ₦{Number(amount).toLocaleString()} from BuyPower Wallet...</span>
+                            <span>Vending ₦{Number(amount).toLocaleString()}...</span>
                           </>
                         ) : (
                           <>
                             <Zap className="w-4 h-4 fill-white" />
-                            <span>⚡ Vend ₦{Number(amount || 0).toLocaleString()} Electricity Token</span>
+                            <span>Vend ₦{Number(amount || 0).toLocaleString()}</span>
                           </>
                         )}
                       </button>
@@ -887,18 +882,16 @@ export const ManualVendModal: React.FC<Props> = ({
                   {/* MODE 2: GENERATE & SEND PAYMENT LINK */}
                   {actionMode === 'payment_link' && (
                     <div className="space-y-3 pt-1">
-                      <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-300 flex items-start gap-2">
-                        <Building2 className="w-4 h-4 shrink-0 text-blue-400 mt-0.5" />
-                        <span>
-                          <strong>Awaiting customer payment:</strong> Generates a checkout payment link + dedicated 30-min bank transfer account. Once paid, the system automatically vends the token without staff intervention.
-                        </span>
+                      <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-300 flex items-center gap-2">
+                        <Building2 className="w-4 h-4 shrink-0 text-blue-400" />
+                        <span>Creates a checkout link and 30-min transfer account. Auto-vends on pay.</span>
                       </div>
 
                       {/* Vend Amount Input */}
                       <div className="space-y-1.5">
                         <label className="text-[11px] font-medium text-zinc-300 uppercase tracking-wider flex items-center justify-between">
-                          <span>Vend Amount (₦)</span>
-                          <span className="text-zinc-400 text-[10px]">+ ₦100 Service Fee</span>
+                          <span>Amount (₦)</span>
+                          <span className="text-zinc-400 text-[10px]">+ ₦100 fee</span>
                         </label>
                         <div className="relative">
                           <span className="absolute left-3.5 top-2.5 text-zinc-400 font-mono text-sm">₦</span>
@@ -933,7 +926,7 @@ export const ManualVendModal: React.FC<Props> = ({
 
                       {/* Total Calculation breakdown */}
                       <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-between text-xs font-mono">
-                        <span className="text-zinc-400">Total Customer Payable:</span>
+                        <span className="text-zinc-400">Total Payable</span>
                         <span className="text-sm font-bold text-white">
                           ₦{(Number(amount || 0) + 100).toLocaleString()}
                         </span>
@@ -947,7 +940,7 @@ export const ManualVendModal: React.FC<Props> = ({
                           onChange={(e) => setNotifyWhatsApp(e.target.checked)}
                           className="rounded border-zinc-800 bg-zinc-900 text-blue-500 focus:ring-blue-500 w-4 h-4"
                         />
-                        <span>Send Payment Link & Virtual Account to customer WhatsApp</span>
+                        <span>Send payment details via WhatsApp</span>
                       </label>
 
                       {submitError && (
@@ -966,12 +959,12 @@ export const ManualVendModal: React.FC<Props> = ({
                         {submitting ? (
                           <>
                             <RotateCw className="w-4 h-4 animate-spin text-white" />
-                            <span>Generating Payment Link & Virtual Account...</span>
+                            <span>Generating Link...</span>
                           </>
                         ) : (
                           <>
                             <LinkIcon className="w-4 h-4" />
-                            <span>Generate & Send Payment Link (₦{(Number(amount || 0) + 100).toLocaleString()})</span>
+                            <span>Send Payment Link (₦{(Number(amount || 0) + 100).toLocaleString()})</span>
                           </>
                         )}
                       </button>
@@ -1004,12 +997,12 @@ export const ManualVendModal: React.FC<Props> = ({
                         {submitting ? (
                           <>
                             <RotateCw className="w-3.5 h-3.5 animate-spin text-zinc-900" />
-                            <span>Saving meter to database...</span>
+                            <span>Saving...</span>
                           </>
                         ) : (
                           <>
                             <BookmarkPlus className="w-3.5 h-3.5 text-zinc-900" />
-                            <span>Save Meter to Customer Registry</span>
+                            <span>Save Meter</span>
                           </>
                         )}
                       </button>

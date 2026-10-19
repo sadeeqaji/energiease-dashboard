@@ -561,10 +561,10 @@ export const SupportDeskView: React.FC<Props> = ({ currentUser, onSelectOrder })
   };
 
   const quickSnippets = [
-    { label: '👋 Greeting', text: 'Hello! Thank you for contacting EnergiEase. How may we assist you today?' },
-    { label: '⚡ Checking DISCO', text: 'We are checking your transaction directly with the DISCO vending servers now. Please give us 1-2 minutes.' },
-    { label: '🎫 Token Resent', text: 'Your token has been regenerated and re-sent to your WhatsApp. Please verify entering it into your meter.' },
-    { label: '🔢 Verify Meter #', text: 'Could you please confirm the 11-digit meter number and DISCO provider?' },
+    { label: 'Greeting', text: 'Hello! Thank you for contacting EnergiEase. How may we assist you today?' },
+    { label: 'Checking DISCO', text: 'We are checking your transaction directly with the DISCO vending servers now. Please give us 1-2 minutes.' },
+    { label: 'Token Resent', text: 'Your token has been regenerated and re-sent to your WhatsApp. Please verify entering it into your meter.' },
+    { label: 'Verify Meter #', text: 'Could you please confirm the 11-digit meter number and DISCO provider?' },
   ];
 
   return (
