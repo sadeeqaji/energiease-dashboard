@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Search, RefreshCw, Zap, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { Users, Search, RefreshCw, Zap, ArrowRight, ArrowUpRight, Plus } from 'lucide-react';
 import { Customer } from '../types';
 import { api } from '../api';
+import { ManualVendModal } from '../components/ManualVendModal';
 
 interface Props {
   onSearchCustomerOrders: (phone: string) => void;
@@ -12,6 +13,9 @@ export const CustomersView: React.FC<Props> = ({ onSearchCustomerOrders }) => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [prefill, setPrefill] = useState<{ meterNumber?: string; disco?: string; phone?: string }>({});
+
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -61,13 +65,26 @@ export const CustomersView: React.FC<Props> = ({ onSearchCustomerOrders }) => {
           </button>
         </form>
 
-        <button
-          onClick={fetchCustomers}
-          disabled={loading}
-          className="h-9 px-3 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-zinc-200' : ''}`} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setPrefill({});
+              setIsModalOpen(true);
+            }}
+            className="h-9 px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Meter & Vend</span>
+          </button>
+
+          <button
+            onClick={fetchCustomers}
+            disabled={loading}
+            className="h-9 px-3 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-zinc-200' : ''}`} />
+          </button>
+        </div>
       </div>
 
       {/* Customers List */}
@@ -120,11 +137,11 @@ export const CustomersView: React.FC<Props> = ({ onSearchCustomerOrders }) => {
                   {c.meters.map((m, idx) => (
                     <div
                       key={idx}
-                      className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800/80 text-xs space-y-1"
+                      className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800/80 text-xs space-y-1.5 group hover:border-zinc-700 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-zinc-200 flex items-center gap-1.5 font-mono">
-                          <Zap className="w-3 h-3 text-zinc-400" />
+                          <Zap className="w-3 h-3 text-emerald-400" />
                           {m.meterNumber}
                         </span>
                         <span className="text-[10px] font-medium uppercase px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 font-mono">
@@ -139,6 +156,23 @@ export const CustomersView: React.FC<Props> = ({ onSearchCustomerOrders }) => {
                           {m.address}
                         </div>
                       )}
+                      <div className="pt-1 flex items-center justify-between border-t border-zinc-900">
+                        <span className="text-[10px] text-zinc-500 uppercase font-mono">{m.vendType || 'PREPAID'}</span>
+                        <button
+                          onClick={() => {
+                            setPrefill({
+                              meterNumber: m.meterNumber,
+                              disco: m.disco,
+                              phone: c.phoneNumber,
+                            });
+                            setIsModalOpen(true);
+                          }}
+                          className="h-6 px-2 rounded bg-zinc-900 hover:bg-emerald-600/20 text-emerald-400 hover:text-emerald-300 border border-zinc-800 hover:border-emerald-500/30 text-[10px] font-medium flex items-center gap-1 transition-colors cursor-pointer"
+                        >
+                          <Zap className="w-2.5 h-2.5 fill-current" />
+                          <span>Quick Vend</span>
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -157,6 +191,18 @@ export const CustomersView: React.FC<Props> = ({ onSearchCustomerOrders }) => {
           )}
         </div>
       </div>
+
+      <ManualVendModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setPrefill({});
+        }}
+        onSuccess={fetchCustomers}
+        prefillMeter={prefill.meterNumber}
+        prefillDisco={prefill.disco}
+        prefillPhone={prefill.phone}
+      />
     </div>
   );
 };

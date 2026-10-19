@@ -13,11 +13,13 @@ import { StaffView } from './views/StaffView';
 import { AnalyticsView } from './views/AnalyticsView';
 import { SupportDeskView } from './views/SupportDeskView';
 import { SettingsView } from './views/SettingsView';
+import { ManualVendModal } from './components/ManualVendModal';
 
 export function App() {
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(api.getSavedUser());
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
+  const [isManualVendOpen, setIsManualVendOpen] = useState(false);
 
   // Global shared data for header and overview
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -124,6 +126,7 @@ export function App() {
           stats={stats}
           user={currentUser}
           onRefresh={loadDashboardData}
+          onOpenManualVend={() => setIsManualVendOpen(true)}
         />
 
         <main className={`flex-1 bg-[#09090b] ${activeTab === 'support_chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
@@ -193,6 +196,13 @@ export function App() {
         user={currentUser}
         onClose={() => setSelectedOrder(null)}
         onOrderUpdated={loadDashboardData}
+      />
+
+      {/* Global Manual Meter Verification & Vending Modal */}
+      <ManualVendModal
+        isOpen={isManualVendOpen}
+        onClose={() => setIsManualVendOpen(false)}
+        onSuccess={loadDashboardData}
       />
     </div>
   );

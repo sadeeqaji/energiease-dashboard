@@ -202,3 +202,51 @@ export interface PaymentGatewayConfig {
   fallbackOrder: ('BuyPowerMFB' | 'Monnify' | 'Paystack')[];
 }
 
+export interface MeterVerificationResult {
+  success: boolean;
+  meterNumber: string;
+  disco: string;
+  vendType: 'PREPAID' | 'POSTPAID';
+  name: string;
+  address: string;
+  minVendAmount: number;
+  raw?: any;
+}
+
+export interface DirectVendResult {
+  success: boolean;
+  reference: string;
+  token: string;
+  units?: string | number;
+  amount: number;
+  meterNumber: string;
+  customerName: string;
+  disco: string;
+  vendType: string;
+  whatsappDeliveryFailed?: boolean;
+  message: string;
+}
+
+export interface PaymentLinkResult {
+  success: boolean;
+  reference: string;
+  totalAmount: number;
+  vendAmount: number;
+  serviceFee: number;
+  meterNumber: string;
+  customerName: string;
+  disco: string;
+  provider?: string;
+  paymentUrl?: string;
+  bankTransferDetails?: {
+    bankName?: string;
+    accountNumber?: string;
+    accountName?: string;
+    expiresOn?: string;
+  };
+  whatsappSent?: boolean;
+  message: string;
+}
+
+
+

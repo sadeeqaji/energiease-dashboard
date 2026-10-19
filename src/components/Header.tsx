@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
 import { DashboardStats, AdminUser } from '../types';
 
 interface Props {
@@ -7,9 +7,10 @@ interface Props {
   stats?: DashboardStats | null;
   user?: AdminUser | null;
   onRefresh: () => Promise<void>;
+  onOpenManualVend?: () => void;
 }
 
-export const Header: React.FC<Props> = ({ title, stats, user, onRefresh }) => {
+export const Header: React.FC<Props> = ({ title, stats, user, onRefresh, onOpenManualVend }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<string>('Just now');
 
@@ -48,6 +49,17 @@ export const Header: React.FC<Props> = ({ title, stats, user, onRefresh }) => {
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span>Live Sync</span>
         </div>
+
+        {/* Manual Vend Button */}
+        {onOpenManualVend && (
+          <button
+            onClick={onOpenManualVend}
+            className="h-8 px-2.5 flex items-center gap-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+          >
+            <Zap className="w-3.5 h-3.5 fill-white" />
+            <span className="hidden sm:inline">Manual Vend</span>
+          </button>
+        )}
 
         {/* Subtle Sync Button */}
         <button

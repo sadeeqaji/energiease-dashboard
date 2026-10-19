@@ -1,4 +1,4 @@
-import { AdminUser, DashboardStats, DiscoHealth, OrderItem, AccountingSummary, Customer, OrderTrend, StaffUser, SupportTicket, SupportTicketDetails, PaymentGatewayConfig } from './types';
+import { AdminUser, DashboardStats, DiscoHealth, OrderItem, AccountingSummary, Customer, OrderTrend, StaffUser, SupportTicket, SupportTicketDetails, PaymentGatewayConfig, MeterVerificationResult, DirectVendResult, PaymentLinkResult } from './types';
 
 const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
@@ -299,6 +299,63 @@ class ApiClient {
     return this.request('/admin/system/payment-gateway', {
       method: 'PATCH',
       body: JSON.stringify({ primaryGateway }),
+    });
+  }
+
+  async verifyMeter(data: {
+    meterNumber: string;
+    disco: string;
+    vendType?: string;
+  }): Promise<MeterVerificationResult> {
+    return this.request<MeterVerificationResult>('/admin/meters/verify', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async saveMeter(data: {
+    meterNumber: string;
+    disco: string;
+    vendType: string;
+    phoneNumber: string;
+    name?: string;
+    address?: string;
+  }): Promise<{ success: boolean; meter: any }> {
+    return this.request<{ success: boolean; meter: any }>('/admin/meters', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async directVend(data: {
+    meterNumber: string;
+    disco: string;
+    vendType: string;
+    amount: number;
+    customerPhone: string;
+    customerName?: string;
+    customerEmail?: string;
+    notifyWhatsApp?: boolean;
+  }): Promise<DirectVendResult> {
+    return this.request<DirectVendResult>('/admin/vend/direct', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createPaymentLink(data: {
+    meterNumber: string;
+    disco: string;
+    vendType: string;
+    amount: number;
+    customerPhone: string;
+    customerName?: string;
+    customerEmail?: string;
+    sendWhatsApp?: boolean;
+  }): Promise<PaymentLinkResult> {
+    return this.request<PaymentLinkResult>('/admin/vend/payment-link', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 }
