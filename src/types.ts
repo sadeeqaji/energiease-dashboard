@@ -171,6 +171,13 @@ export interface SupportTicket {
   meterNo?: string;
   disco?: string;
   lastOrderRef?: string;
+  triage?: {
+    category?: string;
+    isUrgent?: boolean;
+    urgencyScore?: number;
+    isDoubleDebit?: boolean;
+    suggestedAction?: string;
+  };
   messages: SupportMessage[];
   assignedTo?: {
     _id: string;

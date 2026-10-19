@@ -55,6 +55,51 @@ const formatRelativeTime = (dateStr?: string) => {
   }
 };
 
+const getTriageBadge = (triage?: SupportTicket['triage']): { label: string; className: string } | null => {
+  if (!triage) return null;
+  if (triage.isDoubleDebit || triage.category === 'double_debit') {
+    return {
+      label: 'Double Debit',
+      className: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+    };
+  }
+  switch (triage.category) {
+    case 'refund_request':
+      return {
+        label: 'Refund Request',
+        className: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+      };
+    case 'late_transfer':
+      return {
+        label: 'Late Transfer',
+        className: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      };
+    case 'payment_pending':
+      return {
+        label: 'Payment Check',
+        className: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      };
+    case 'disco_delay':
+      return {
+        label: 'DISCO Delay',
+        className: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+      };
+    case 'meter_reject':
+      return {
+        label: 'Meter Error',
+        className: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+      };
+    default:
+      if (triage.isUrgent) {
+        return {
+          label: 'Priority',
+          className: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+        };
+      }
+      return null;
+  }
+};
+
 const getCustomerJourney = (details: SupportTicketDetails): JourneyEvent[] => {
   const events: JourneyEvent[] = [];
   const { ticket, customerContext } = details;
@@ -724,6 +769,7 @@ export const SupportDeskView: React.FC<Props> = ({ currentUser, onSelectOrder })
                 const lastMsg = t.messages[t.messages.length - 1];
                 const isNeedsReply = t.status === 'pending_agent';
                 const isClosed = t.status === 'resolved';
+                const triageBadge = getTriageBadge(t.triage);
 
                 return (
                   <div
@@ -736,9 +782,16 @@ export const SupportDeskView: React.FC<Props> = ({ currentUser, onSelectOrder })
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="font-mono text-[11px] font-medium text-zinc-400">
-                        #{t.ticketId}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-[11px] font-medium text-zinc-400">
+                          #{t.ticketId}
+                        </span>
+                        {triageBadge && (
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${triageBadge.className}`}>
+                            {triageBadge.label}
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[10px] text-zinc-500 font-mono tabular-nums">
                         {new Date(t.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
@@ -795,9 +848,19 @@ export const SupportDeskView: React.FC<Props> = ({ currentUser, onSelectOrder })
                     WA
                   </div>
                   <div className="min-w-0">
-                    <h2 className="text-xs sm:text-sm font-semibold text-zinc-100 truncate">
-                      {ticketDetails.ticket.customerName || 'Customer'}
-                    </h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xs sm:text-sm font-semibold text-zinc-100 truncate">
+                        {ticketDetails.ticket.customerName || 'Customer'}
+                      </h2>
+                      {(() => {
+                        const badge = getTriageBadge(ticketDetails.ticket.triage);
+                        return badge ? (
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border shrink-0 ${badge.className}`}>
+                            {badge.label}
+                          </span>
+                        ) : null;
+                      })()}
+                    </div>
                     <p className="text-[11px] text-zinc-400 font-mono flex items-center gap-1.5 truncate">
                       <span>{ticketDetails.ticket.customerPhone}</span>
                       <span className="text-zinc-600">•</span>
