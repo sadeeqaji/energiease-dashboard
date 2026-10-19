@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Zap, 
@@ -18,7 +18,6 @@ import {
   BookmarkPlus,
   Landmark,
   Building2,
-  Clock,
   ShieldCheck
 } from 'lucide-react';
 import { api } from '../api';
@@ -34,19 +33,54 @@ interface Props {
 }
 
 const DISCOS = [
-  { code: 'AEDC', name: 'Abuja Electricity (AEDC)' },
-  { code: 'EKEDC', name: 'Eko Electricity (EKEDC)' },
-  { code: 'IKEDC', name: 'Ikeja Electric (IKEDC)' },
-  { code: 'IBEDC', name: 'Ibadan Electricity (IBEDC)' },
-  { code: 'KEDCO', name: 'Kano Electricity (KEDCO)' },
-  { code: 'JED', name: 'Jos Electricity (JED)' },
-  { code: 'KAEDCO', name: 'Kaduna Electric (KAEDCO)' },
-  { code: 'EEDC', name: 'Enugu Electricity (EEDC)' },
-  { code: 'BEDC', name: 'Benin Electricity (BEDC)' },
-  { code: 'PHED', name: 'Port Harcourt Electricity (PHED)' },
-  { code: 'YEDC', name: 'Yola Electricity (YEDC)' },
-  { code: 'ABA', name: 'Aba Power (ABA)' },
+  { code: 'ABUJA', name: 'Abuja Electricity (AEDC)' },
+  { code: 'EKO', name: 'Eko Electricity (EKEDC)' },
+  { code: 'IKEJA', name: 'Ikeja Electric (IKEDC)' },
+  { code: 'IBADAN', name: 'Ibadan Electricity (IBEDC)' },
+  { code: 'KANO', name: 'Kano Electricity (KEDCO)' },
+  { code: 'JOS', name: 'Jos Electricity (JED)' },
+  { code: 'KADUNA', name: 'Kaduna Electric (KAEDCO)' },
+  { code: 'ENUGU', name: 'Enugu Electricity (EEDC)' },
+  { code: 'BENIN', name: 'Benin Electricity (BEDC)' },
+  { code: 'PH', name: 'Port Harcourt Electricity (PHED)' },
+  { code: 'YOLA', name: 'Yola Electricity (YEDC)' },
+  { code: 'ABAPOWER', name: 'Aba Power (ABA)' },
 ];
+
+const DISCO_ALIASES: Record<string, string> = {
+  AEDC: 'ABUJA',
+  ABUJA: 'ABUJA',
+  EKEDC: 'EKO',
+  EKO: 'EKO',
+  IKEDC: 'IKEJA',
+  IKEJA: 'IKEJA',
+  IBEDC: 'IBADAN',
+  IBADAN: 'IBADAN',
+  KEDCO: 'KANO',
+  KANO: 'KANO',
+  JED: 'JOS',
+  JOS: 'JOS',
+  KAEDCO: 'KADUNA',
+  KADUNA: 'KADUNA',
+  EEDC: 'ENUGU',
+  ENUGU: 'ENUGU',
+  BEDC: 'BENIN',
+  BENIN: 'BENIN',
+  PHED: 'PH',
+  PORT_HARCOURT: 'PH',
+  PH: 'PH',
+  YEDC: 'YOLA',
+  YOLA: 'YOLA',
+  ABA: 'ABAPOWER',
+  ABAPOWER: 'ABAPOWER',
+  APLE: 'ABAPOWER',
+};
+
+const normalizeDisco = (d?: string) => {
+  if (!d) return 'ABUJA';
+  const upper = d.trim().toUpperCase();
+  return DISCO_ALIASES[upper] || upper;
+};
 
 const PRESET_AMOUNTS = [1000, 2000, 5000, 10000, 20000];
 
@@ -55,21 +89,18 @@ export const ManualVendModal: React.FC<Props> = ({
   onClose,
   onSuccess,
   prefillMeter = '',
-  prefillDisco = 'AEDC',
+  prefillDisco = 'ABUJA',
   prefillPhone = '',
 }) => {
   // Step 1: Verification Form
   const [meterNumber, setMeterNumber] = useState(prefillMeter);
-  const [disco, setDisco] = useState(prefillDisco);
+  const [disco, setDisco] = useState(normalizeDisco(prefillDisco));
   const [vendType, setVendType] = useState<'PREPAID' | 'POSTPAID'>('PREPAID');
   const [verifying, setVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<MeterVerificationResult | null>(null);
   const [verificationError, setVerificationError] = useState<string | null>(null);
 
   // Step 2: Action Mode
-  // 'direct_vend': Customer paid manually to bank -> Vend token immediately
-  // 'payment_link': Customer needs payment link -> Send link/account to WhatsApp
-  // 'save_only': Just add meter to customer profile
   const [actionMode, setActionMode] = useState<'direct_vend' | 'payment_link' | 'save_only'>('direct_vend');
   
   const [customerPhone, setCustomerPhone] = useState(prefillPhone);
@@ -88,6 +119,19 @@ export const ManualVendModal: React.FC<Props> = ({
   const [tokenCopied, setTokenCopied] = useState(false);
   const [accountCopied, setAccountCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMeterNumber(prefillMeter || '');
+      setDisco(normalizeDisco(prefillDisco));
+      setCustomerPhone(prefillPhone || '');
+      setVerificationResult(null);
+      setVerificationError(null);
+      setSubmitError(null);
+      setVendResult(null);
+      setLinkResult(null);
+    }
+  }, [isOpen, prefillMeter, prefillDisco, prefillPhone]);
 
   if (!isOpen) return null;
 
